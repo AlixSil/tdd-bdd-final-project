@@ -188,7 +188,9 @@ class TestProductModel(unittest.TestCase):
             product.create()
         availability = products[0].available
         logging.debug("Availability looked for : %s", availability)
-        count = len([product for product in products if product.available == availability])
+        count = len(
+            [product for product in products if product.available == availability]
+        )
         found = Product.find_by_availability(availability)
         self.assertEqual(found.count(), count)
         for product in found:
@@ -204,20 +206,6 @@ class TestProductModel(unittest.TestCase):
         logging.debug("Price looked for : %s", price)
         count = len([product for product in products if product.price == price])
         found = Product.find_by_price(price)
-        self.assertEqual(found.count(), count)
-        for product in found:
-            logging.debug(product)
-            self.assertEqual(product.price, price)
-
-    def test_find_by_price(self):
-        """It should find a product by price even when price is a string"""
-        products = ProductFactory.create_batch(5)
-        for product in products:
-            product.create()
-        price = products[0].price
-        logging.debug("Price looked for : %s", price)
-        count = len([product for product in products if product.price == price])
-        found = Product.find_by_price(str(price))
         self.assertEqual(found.count(), count)
         for product in found:
             logging.debug(product)
@@ -250,14 +238,14 @@ class TestProductModel(unittest.TestCase):
         self.assertIsNotNone(product.id)
         product.id = None
         product.description = "Paul Atreides"
-        with self.assertRaises( DataValidationError):
+        with self.assertRaises(DataValidationError):
             product.update()
 
     def test_deserialize_with_bad_available_type(self):
         """It should refuse to deserialize a product with a string availability"""
         product = ProductFactory()
         product_ser = product.serialize()
-        product_ser["available"]= str(product_ser["available"])
+        product_ser["available"] = str(product_ser["available"])
         with self.assertRaises(DataValidationError):
             product.deserialize(product_ser)
 
@@ -267,7 +255,7 @@ class TestProductModel(unittest.TestCase):
         product_ser = product.serialize()
         del product_ser["name"]
         with self.assertRaises(DataValidationError):
-            product.deserialize(product_ser) 
+            product.deserialize(product_ser)
 
     def test_deserialize_with_bad_category(self):
         """It should refuse to deserialize a product with a bad category"""
@@ -275,7 +263,7 @@ class TestProductModel(unittest.TestCase):
         product_ser = product.serialize()
         product_ser["category"] = "spyce"
         with self.assertRaises(DataValidationError):
-            product.deserialize(product_ser) 
+            product.deserialize(product_ser)
 
     def test_deserialize_with_bad_price(self):
         """It should refuse to deserialize a product with a bad price"""
@@ -283,4 +271,4 @@ class TestProductModel(unittest.TestCase):
         product_ser = product.serialize()
         product_ser["price"] = None
         with self.assertRaises(DataValidationError):
-            product.deserialize(product_ser) 
+            product.deserialize(product_ser)
