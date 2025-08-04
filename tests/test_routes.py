@@ -85,7 +85,9 @@ class TestProductRoutes(TestCase):
             test_product = ProductFactory()
             response = self.client.post(BASE_URL, json=test_product.serialize())
             self.assertEqual(
-                response.status_code, status.HTTP_201_CREATED, "Could not create test product"
+                response.status_code,
+                status.HTTP_201_CREATED,
+                "Could not create test product",
             )
             new_product = response.get_json()
             test_product.id = new_product["id"]
@@ -106,7 +108,7 @@ class TestProductRoutes(TestCase):
         response = self.client.get("/health")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
-        self.assertEqual(data['message'], 'OK')
+        self.assertEqual(data["message"], "OK")
 
     # ----------------------------------------------------------
     # TEST CREATE
@@ -166,6 +168,22 @@ class TestProductRoutes(TestCase):
     #
     # ADD YOUR TEST CASES HERE
     #
+
+    def test_get_products(self):
+        """It should read the product we just created"""
+        test_product = self._create_products(1)[0]
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(data["name"], test_product.name)
+        self.assertEqual(data["description"], test_product.description)
+        self.assertAlmostEqual(Decimal(data["price"]), test_product.price)
+        self.assertEqual(data["available"], test_product.available)
+
+    def test_get_product_not_found(self):
+        """It should get 404 error when reading an inexistant product"""
+        response = self.client.get(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     ######################################################################
     # Utility functions
