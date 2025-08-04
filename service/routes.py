@@ -98,6 +98,7 @@ def create_products():
 # L I S T   A L L   P R O D U C T S
 ######################################################################
 
+
 @app.route("/products", methods=["GET"])
 def list_products():
     """Returns a list of Products"""
@@ -128,6 +129,8 @@ def list_products():
     results = [product.serialize() for product in products]
     app.logger.info("[%s] Products returned", len(results))
     return results, status.HTTP_200_OK
+
+
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
@@ -156,20 +159,21 @@ def get_product(product_id):
 # U P D A T E   A   P R O D U C T
 ######################################################################
 
+
 @app.route("/products/<int:product_id>", methods=["PUT"])
 def update_product(product_id):
-
     app.logger.info("Request to Update a product with id [%s]", product_id)
     check_content_type("application/json")
 
     product = Product.find(product_id)
     if not product:
         abort(status.HTTP_404_NOT_FOUND, f"Product with id {product_id} was not found")
-    
+
     product.deserialize(request.get_json())
     product.update()
 
     return product.serialize(), status.HTTP_200_OK
+
 
 ######################################################################
 # D E L E T E   A   P R O D U C T

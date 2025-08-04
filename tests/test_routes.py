@@ -189,15 +189,14 @@ class TestProductRoutes(TestCase):
     def test_update_product(self):
         """It should update a product Description"""
         test_product = ProductFactory()
-        response = self.client.post(f"{BASE_URL}", json =test_product.serialize())
+        response = self.client.post(f"{BASE_URL}", json=test_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         product = response.get_json()
         product["description"] = "Arrakis"
-        response = self.client.put(f"{BASE_URL}/{product['id']}", json = product)
+        response = self.client.put(f"{BASE_URL}/{product['id']}", json=product)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         updated_data = response.get_json()
         self.assertEqual(product["description"], updated_data["description"])
-
 
     def test_update_product_not_found(self):
         """It should get 404 error when updating inexistant product"""
@@ -205,11 +204,10 @@ class TestProductRoutes(TestCase):
         response = self.client.put(f"{BASE_URL}/0", json=test_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-
     def test_delete_product(self):
         """It should delete the product we just created"""
         products = self._create_products(5)
-      #  product_count = self.get_product_count()
+        #  product_count = self.get_product_count()
         test_product = products[0]
         response = self.client.delete(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -217,12 +215,13 @@ class TestProductRoutes(TestCase):
         # make sure they are deleted
         response = self.client.get(f"{BASE_URL}/{test_product.id}")
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-       # new_count = self.get_product_count()
-       # self.assertEqual(new_count, product_count - 1)
+
+    # new_count = self.get_product_count()
+    # self.assertEqual(new_count, product_count - 1)
 
     def test_list_all(self):
         """It should list all existing products"""
-        products = self._create_products(5)
+        self._create_products(5)
         response = self.client.get(f"{BASE_URL}")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
@@ -238,11 +237,9 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), count_names)
-        for product in data :
-            self.assertEqual(
-                product["name"], test_product.name
-            )
-    
+        for product in data:
+            self.assertEqual(product["name"], test_product.name)
+
     def test_query_by_category(self):
         """It should Query Products by category"""
         products = self._create_products(10)
@@ -263,12 +260,12 @@ class TestProductRoutes(TestCase):
     def test_query_by_availability(self):
         """It should Query Products by availability"""
         products = self._create_products(10)
-        available_products = [product for product in products if product.available is True]
-        available_count = len(available_products)        
+        available_products = [
+            product for product in products if product.available is True
+        ]
+        available_count = len(available_products)
         # test for available
-        response = self.client.get(
-            BASE_URL, query_string="available=true"
-        )
+        response = self.client.get(BASE_URL, query_string="available=true")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         data = response.get_json()
         self.assertEqual(len(data), available_count)
