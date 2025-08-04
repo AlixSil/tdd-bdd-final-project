@@ -199,11 +199,33 @@ class TestProductRoutes(TestCase):
 
 
     def test_update_product_not_found(self):
-        """It should get 404 error when updating inexistatn product"""
+        """It should get 404 error when updating inexistant product"""
         test_product = ProductFactory()
         response = self.client.put(f"{BASE_URL}/0", json=test_product.serialize())
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+
+    def test_delete_product(self):
+        """It should delete the product we just created"""
+        products = self._create_products(5)
+      #  product_count = self.get_product_count()
+        test_product = products[0]
+        response = self.client.delete(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(response.data), 0)
+        # make sure they are deleted
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+       # new_count = self.get_product_count()
+       # self.assertEqual(new_count, product_count - 1)
+
+    def test_list_all(self):
+        """It should list all existing products"""
+        products = self._create_products(5)
+        response = self.client.get(f"{BASE_URL}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        data = response.get_json()
+        self.assertEqual(len(data), 5)
 
     ######################################################################
     # Utility functions

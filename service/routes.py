@@ -98,9 +98,20 @@ def create_products():
 # L I S T   A L L   P R O D U C T S
 ######################################################################
 
-#
-# PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
-#
+@app.route("/products", methods=["GET"])
+def get_products():
+    """
+    Retrieve all products
+
+    """
+
+    app.logger.info("Requests to Retieve all products")
+
+    products = [ p.serialize() for p in Product.all()]
+
+    app.logger.info("Found %s products", len(products))
+
+    return products, status.HTTP_200_OK
 
 ######################################################################
 # R E A D   A   P R O D U C T
@@ -108,7 +119,7 @@ def create_products():
 
 
 @app.route("/products/<int:product_id>", methods=["GET"])
-def get_products(product_id):
+def get_product(product_id):
     """
     Retrieve a single product
 
@@ -131,7 +142,7 @@ def get_products(product_id):
 ######################################################################
 
 @app.route("/products/<int:product_id>", methods=["PUT"])
-def update_procut(product_id):
+def update_product(product_id):
 
     app.logger.info("Request to Update a product with id [%s]", product_id)
     check_content_type("application/json")
@@ -150,6 +161,14 @@ def update_procut(product_id):
 ######################################################################
 
 
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
+@app.route("/products/<int:product_id>", methods=["DELETE"])
+def delete_products(product_id):
+    """
+    Delete a Product
+    This endpoint will delete a Product based the id specified in the path
+    """
+    app.logger.info("Request to Delete a product with id [%s]", product_id)
+    product = Product.find(product_id)
+    if product:
+        product.delete()
+    return "", status.HTTP_204_NO_CONTENT
